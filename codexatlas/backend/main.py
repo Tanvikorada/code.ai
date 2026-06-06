@@ -8,8 +8,8 @@ from slowapi.errors import RateLimitExceeded
 from app.database import engine, Base
 from app.api import github, graph, architecture, documentation, health, ai, auth
 
-# Create database tables (now managed by Alembic)
-# Base.metadata.create_all(bind=engine)
+# Create database tables (now managed by Alembic but migrations are missing)
+Base.metadata.create_all(bind=engine)
 
 # Initialize slowapi rate limiter
 limiter = Limiter(key_func=get_remote_address)
