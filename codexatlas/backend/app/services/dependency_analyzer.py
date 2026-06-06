@@ -15,7 +15,9 @@ class DependencyAnalyzer:
         for edge in edges:
             graph.add_edge(edge.source, edge.target)
         
-        cycles = list(nx.simple_cycles(graph))
+        import itertools
+        # Cap at 50 cycles to prevent OOM/timeouts on complex graphs
+        cycles = list(itertools.islice(nx.simple_cycles(graph), 50))
         return cycles
     
     def find_unused_files(self, nodes: List[Node], edges: List[Edge]) -> List[str]:

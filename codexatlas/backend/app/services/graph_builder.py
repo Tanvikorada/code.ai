@@ -142,9 +142,11 @@ class GraphBuilder:
                 target_nodes = []
                 
                 # Look for file with matching name
+                imp_base = imp.split('/')[-1]
                 for node in nodes:
                     if node.node_type in ['file', 'component', 'class']:
-                        if imp in node.name or node.name in imp:
+                        node_base = node.name.split('.')[0] if '.' in node.name else node.name
+                        if imp_base == node_base or imp_base == node.name:
                             target_nodes.append(node)
                 
                 for target in target_nodes:
