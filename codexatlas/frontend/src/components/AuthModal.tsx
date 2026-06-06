@@ -16,7 +16,7 @@ export default function AuthModal({ onClose, onLogin }: { onClose: () => void, o
         await apiService.login(username, password);
         onLogin();
       } else {
-        await apiService.register(username, password, email);
+        await apiService.register(username, password, username);
         await apiService.login(username, password);
         onLogin();
       }
@@ -41,23 +41,13 @@ export default function AuthModal({ onClose, onLogin }: { onClose: () => void, o
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
-              type="text"
-              placeholder="Username"
+              type="email"
+              placeholder="Email address"
               value={username}
               onChange={e => setUsername(e.target.value)}
               className="bg-white/[0.03] border border-white/[0.08] focus:border-aurora-cyan/50 focus:bg-white/[0.05] p-4 rounded-xl text-white placeholder-white/30 outline-none transition-all font-medium"
               required
             />
-            {!isLogin && (
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="bg-white/[0.03] border border-white/[0.08] focus:border-aurora-cyan/50 focus:bg-white/[0.05] p-4 rounded-xl text-white placeholder-white/30 outline-none transition-all font-medium"
-                required
-              />
-            )}
             <input
               type="password"
               placeholder="Password"
