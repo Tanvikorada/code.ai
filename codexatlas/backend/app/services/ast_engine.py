@@ -16,11 +16,6 @@ class ASTEngine:
             self.JS_LANGUAGE = Language(tsjavascript.language())
             self.TS_LANGUAGE = Language(tstypescript.language_typescript())
             
-            self.js_parser = Parser()
-            self.js_parser.set_language(self.JS_LANGUAGE)
-            
-            self.ts_parser = Parser()
-            self.ts_parser.set_language(self.TS_LANGUAGE)
             self.tree_sitter_ready = True
         except ImportError:
             self.tree_sitter_ready = False
@@ -82,7 +77,9 @@ class ASTEngine:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            parser = self.ts_parser if is_typescript else self.js_parser
+            from tree_sitter import Parser
+            parser = Parser()
+            parser.set_language(self.TS_LANGUAGE if is_typescript else self.JS_LANGUAGE)
             tree = parser.parse(bytes(content, "utf8"))
             
             functions = []
@@ -141,7 +138,7 @@ class ASTEngine:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            functions = re.findall(r'(?:function\s+|const\s+|let\s+|var\s+)(\w+)\s*(?:=|:\s*function|:\s*async\s*function|\()?.*?=>|\(', content)
+            functions = re.findall(r'(?:function\s+|const\s+|let\s+|var\s+)(\w+)\s*(?:=|:\s*function|:\s*async\s*function|\()', content)
             classes = re.findall(r'class\s+(\w+)', content)
             imports = re.findall(r'import\s+.*?\s+from\s+[\'"]([^\'"]+)[\'"]', content)
             exports = re.findall(r'export\s+(?:default\s+)?(?:const|function|class|let|var)\s+(\w+)', content)
