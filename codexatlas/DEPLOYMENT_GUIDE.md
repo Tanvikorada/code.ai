@@ -14,7 +14,7 @@ If you haven't already, push your local git repository to GitHub:
 1. Go to github.com and create a new empty repository named `codexatlas`.
 2. In your local terminal, run:
    ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/codexatlas.git
+   git remote add origin https://github.com/Tanvikorada/code.ai.git
    git branch -M master
    git push -u origin master
    ```
@@ -57,7 +57,7 @@ apt install docker.io docker-compose git -y
 ### Step 4: Clone & Deploy
 On the server, clone your repository and launch it!
 ```bash
-git clone https://github.com/YOUR_USERNAME/codexatlas.git
+git clone https://github.com/Tanvikorada/code.ai.git
 cd codexatlas
 
 # Run the magic command!

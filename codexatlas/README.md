@@ -58,7 +58,7 @@ Turn any GitHub repository into an interactive software universe where developer
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/codexatlas.git
+git clone https://github.com/Tanvikorada/code.ai.git
 cd codexatlas
 ```
 
