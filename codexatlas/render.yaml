@@ -9,8 +9,4 @@ services:
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL
-        value: sqlite:////data/codexatlas.db
-    disk:
-      name: sqlite-data
-      mountPath: /data
-      sizeGB: 1
+        value: sqlite:///codexatlas.db
