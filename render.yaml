@@ -4,7 +4,7 @@ services:
     env: docker
     region: ohio # or another preferred region
     plan: free # or starter for more resources
-    repo: https://github.com/your-username/codexatlas # Replace with your actual repo
+    repo: https://github.com/Tanvikorada/code.ai
     rootDir: codexatlas/backend
     healthCheckPath: /
     envVars:
