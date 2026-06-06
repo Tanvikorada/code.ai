@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: codexatlas-backend
+    env: docker
+    region: ohio # or another preferred region
+    plan: free # or starter for more resources
+    repo: https://github.com/your-username/codexatlas # Replace with your actual repo
+    rootDir: backend
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:////data/codexatlas.db
+    disk:
+      name: sqlite-data
+      mountPath: /data
+      sizeGB: 1
