@@ -47,10 +47,11 @@ class RepositoryScanner:
                     if not os.path.islink(fp):
                         total_size += os.path.getsize(fp)
             
-            # Limit to 50MB
-            if total_size > 50 * 1024 * 1024:
+            # Limit to configured max size (default 200MB)
+            max_mb = int(os.environ.get("MAX_REPO_SIZE_MB", 200))
+            if total_size > max_mb * 1024 * 1024:
                 self.cleanup(clone_path)
-                raise Exception("Repository exceeds the maximum allowed size of 50MB.")
+                raise Exception(f"Repository exceeds the maximum allowed size of {max_mb}MB.")
                 
             return clone_path
         except subprocess.TimeoutExpired as e:

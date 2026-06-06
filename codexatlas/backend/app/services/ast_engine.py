@@ -37,6 +37,42 @@ class ASTEngine:
         else:
             return self._parse_generic(file_path)
 
+    def _parse_python(self, file_path: str) -> Dict[str, Any]:
+        """Parse Python file using AST"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            tree = ast.parse(content, filename=file_path)
+            
+            functions = []
+            classes = []
+            imports = []
+            
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    functions.append(node.name)
+                elif isinstance(node, ast.ClassDef):
+                    classes.append(node.name)
+                elif isinstance(node, ast.Import):
+                    for alias in node.names:
+                        imports.append(alias.name)
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        imports.append(node.module)
+            
+            return {
+                'language': 'python',
+                'functions': functions,
+                'classes': classes,
+                'components': [],
+                'imports': list(set(imports)),
+                'exports': [],
+                'complexity': len(functions) + len(classes)
+            }
+        except Exception as e:
+            return {'error': str(e), 'language': 'python'}
+
     def _parse_tree_sitter(self, file_path: str, is_typescript: bool) -> Dict[str, Any]:
         """Parse JavaScript/TypeScript using official Tree-Sitter AST"""
         if not self.tree_sitter_ready:
@@ -105,10 +141,10 @@ class ASTEngine:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            functions = re.findall(r'(?:function|const\s+\w+\s*=\s*(?:async\s*)?)\s*(\w+)\s*\(', content)
+            functions = re.findall(r'(?:function\s+|const\s+|let\s+|var\s+)(\w+)\s*(?:=|:\s*function|:\s*async\s*function|\()?.*?=>|\(', content)
             classes = re.findall(r'class\s+(\w+)', content)
             imports = re.findall(r'import\s+.*?\s+from\s+[\'"]([^\'"]+)[\'"]', content)
-            exports = re.findall(r'export\s+(?:default\s+)?(?:const|function|class)\s+(\w+)', content)
+            exports = re.findall(r'export\s+(?:default\s+)?(?:const|function|class|let|var)\s+(\w+)', content)
             
             components = []
             for cls in classes:
@@ -127,6 +163,7 @@ class ASTEngine:
         except Exception as e:
             return {'error': str(e), 'language': 'javascript'}
 
+    def _parse_generic(self, file_path: str) -> Dict[str, Any]:
         """Basic parsing for unsupported languages"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/useStore'
 import { apiService } from '../lib/api'
-import { ArrowLeft, Layers, Database, Server, Cpu, Lock, Globe } from 'lucide-react'
+import { ArrowLeft, Layers, Database, Server, Cpu, Lock, Globe, FileCode } from 'lucide-react'
 
 interface Layer {
   name: string
@@ -25,51 +25,30 @@ const Architecture = () => {
     }
   }, [id])
 
+  const getLayerIcon = (name: string) => {
+    const nameLower = name.toLowerCase()
+    if (nameLower.includes('frontend')) return <Layers className="w-6 h-6" />
+    if (nameLower.includes('backend') || nameLower.includes('api')) return <Server className="w-6 h-6" />
+    if (nameLower.includes('database') || nameLower.includes('db') || nameLower.includes('models')) return <Database className="w-6 h-6" />
+    if (nameLower.includes('infrastructure') || nameLower.includes('config')) return <Cpu className="w-6 h-6" />
+    if (nameLower.includes('auth')) return <Lock className="w-6 h-6" />
+    if (nameLower.includes('external')) return <Globe className="w-6 h-6" />
+    return <FileCode className="w-6 h-6" />
+  }
+
   const loadArchitecture = async (repoId: string) => {
     try {
       const data = await apiService.getArchitecture(repoId)
+      const layersData = data.layers || []
       
-      // Mock architecture layers for now
-      const mockLayers: Layer[] = [
-        {
-          name: 'Frontend Layer',
-          icon: <Layers className="w-6 h-6" />,
-          components: ['React Components', 'UI Library', 'State Management'],
-          color: 'from-accent-primary to-accent-secondary',
-        },
-        {
-          name: 'Backend Layer',
-          icon: <Server className="w-6 h-6" />,
-          components: ['API Endpoints', 'Business Logic', 'Services'],
-          color: 'from-accent-secondary to-accent-tertiary',
-        },
-        {
-          name: 'Database Layer',
-          icon: <Database className="w-6 h-6" />,
-          components: ['Data Models', 'Queries', 'Migrations'],
-          color: 'from-accent-tertiary to-green-500',
-        },
-        {
-          name: 'Infrastructure',
-          icon: <Cpu className="w-6 h-6" />,
-          components: ['Deployment', 'CI/CD', 'Monitoring'],
-          color: 'from-green-500 to-blue-500',
-        },
-        {
-          name: 'Authentication',
-          icon: <Lock className="w-6 h-6" />,
-          components: ['Auth Providers', 'JWT', 'Session Management'],
-          color: 'from-blue-500 to-purple-500',
-        },
-        {
-          name: 'External Services',
-          icon: <Globe className="w-6 h-6" />,
-          components: ['Third-party APIs', 'Webhooks', 'CDN'],
-          color: 'from-purple-500 to-pink-500',
-        },
-      ]
+      const mappedLayers: Layer[] = layersData.map((layer: any) => ({
+        name: layer.name,
+        icon: getLayerIcon(layer.name),
+        components: layer.components || [],
+        color: layer.color || 'from-gray-500 to-gray-700',
+      }))
       
-      setLayers(mockLayers)
+      setLayers(mappedLayers)
     } catch (error) {
       console.error('Failed to load architecture:', error)
     } finally {

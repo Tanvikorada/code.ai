@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useStore } from '../store/useStore'
 import { apiService } from '../lib/api'
 import { ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { AIArchitect } from '../components/AIArchitect'
 
 const Repository = () => {
   const { id } = useParams<{ id: string }>()
@@ -127,7 +128,7 @@ const Repository = () => {
           </div>
 
           {/* Analysis Summary */}
-          <div className="glass-card rounded-3xl p-10 relative overflow-hidden">
+          <div className="glass-card rounded-3xl p-10 relative overflow-hidden mb-8">
              <div className="absolute bottom-0 left-0 w-64 h-64 bg-aurora-purple/5 blur-[80px] rounded-full pointer-events-none" />
             
             <h2 className="text-2xl font-bold mb-8 tracking-tight relative z-10">Health Overview</h2>
@@ -145,6 +146,12 @@ const Repository = () => {
                 <div className="text-white/50 text-sm font-medium">Documentation</div>
               </div>
             </div>
+          </div>
+
+          {/* AI Architect Section */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold mb-4 tracking-tight">AI Assistant</h2>
+            <AIArchitect repoId={id || ''} />
           </div>
         </motion.div>
       </div>

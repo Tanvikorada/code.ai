@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import uuid
@@ -28,12 +28,12 @@ class StatusResponse(BaseModel):
 @router.post("/scan", response_model=ScanResponse)
 async def scan_repository(
     request: ScanRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Scan a GitHub repository using Celery for background processing"""
-    from app.worker import process_repository_task
-    
+    """Scan a GitHub repository using Celery or FastAPI BackgroundTasks for background processing"""
+    import os
     repo_id = str(uuid.uuid4())
     
     # Create the initial record in DB
@@ -46,13 +46,30 @@ async def scan_repository(
     db.add(new_scan)
     db.commit()
     
-    # Spawn background task via Celery
-    process_repository_task.delay(repo_id, request.url)
+    # Check if Celery/Redis is explicitly requested or if we are in production
+    redis_url = os.environ.get("REDIS_URL")
+    use_celery = os.environ.get("USE_CELERY", "false").lower() == "true" or (redis_url is not None and "localhost" not in redis_url)
+    
+    if use_celery:
+        try:
+            from app.worker import process_repository_task
+            process_repository_task.delay(repo_id, request.url)
+            return ScanResponse(
+                id=repo_id,
+                status="processing",
+                message="Repository scan started in the background via Celery."
+            )
+        except Exception:
+            # Fall back to BackgroundTasks if Celery fails
+            pass
+            
+    # Default to FastAPI BackgroundTasks (requires zero external infrastructure / Redis)
+    background_tasks.add_task(process_repository, repo_id, request.url)
     
     return ScanResponse(
         id=repo_id,
         status="processing",
-        message="Repository scan started in the background."
+        message="Repository scan started in the background via FastAPI BackgroundTasks."
     )
 
 @router.get("/status/{repo_id}", response_model=StatusResponse)

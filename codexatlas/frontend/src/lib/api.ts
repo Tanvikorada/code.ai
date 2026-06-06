@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE_URL = import.meta.env.VITE_API_URL || ''
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -117,8 +117,12 @@ export const apiService = {
     return response.data
   },
 
-  async askAI(repoId: string, question: string): Promise<any> {
-    const response = await api.post('/api/ai/ask', { repoId, question })
+  async askAI(repoId: string, question: string, customApiKey?: string): Promise<any> {
+    const headers: any = {}
+    if (customApiKey) {
+      headers['X-Custom-API-Key'] = customApiKey
+    }
+    const response = await api.post('/api/ai/ask', { repoId, question }, { headers })
     return response.data
   },
 }
