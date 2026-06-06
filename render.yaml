@@ -10,3 +10,20 @@ services:
     envVars:
       - key: DATABASE_URL
         value: sqlite:///codexatlas.db
+
+  - type: web
+    name: codexatlas-frontend
+    env: static
+    region: ohio
+    plan: free
+    repo: https://github.com/Tanvikorada/code.ai
+    rootDir: codexatlas/frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: codexatlas-backend
+          envVarKey: RENDER_EXTERNAL_URL
+
