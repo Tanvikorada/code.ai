@@ -138,7 +138,7 @@ const Landing = () => {
         </header>
 
         {/* Hero Section */}
-        <section className="container mx-auto px-6 pt-32 pb-24 text-center">
+        <section id="demo" className="container mx-auto px-6 pt-32 pb-24 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
