@@ -81,7 +81,7 @@ const Explorer = () => {
         position: { x: Math.random() * 800, y: Math.random() * 600 },
         data: {
           label: node.name,
-          type: node.type,
+          type: node.node_type || node.type,
           path: node.path,
         },
       }))

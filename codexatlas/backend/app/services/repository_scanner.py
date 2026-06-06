@@ -95,41 +95,55 @@ class RepositoryScanner:
         return dominant_lang if language_counts[dominant_lang] > 0 else 'unknown'
     
     def detect_framework(self, repo_path: str, language: str) -> str:
-        """Detect the framework being used"""
+        """Detect the framework being used by searching up to 2 directories deep"""
         framework = 'unknown'
         
+        # Helper to search for a file up to 2 levels deep
+        def find_file(filename):
+            for root, dirs, files in os.walk(repo_path):
+                # Calculate depth
+                depth = root[len(repo_path):].count(os.sep)
+                if depth > 1:
+                    dirs[:] = [] # Stop traversing deeper
+                    continue
+                if filename in files:
+                    return os.path.join(root, filename)
+            return None
+
         # Check for package.json (JavaScript/TypeScript)
-        if os.path.exists(os.path.join(repo_path, 'package.json')):
-            with open(os.path.join(repo_path, 'package.json'), 'r') as f:
+        package_json_path = find_file('package.json')
+        if package_json_path:
+            with open(package_json_path, 'r', encoding='utf-8') as f:
                 package_json = f.read()
                 if 'react' in package_json:
                     framework = 'React'
-                elif 'vue' in package_json:
+                if 'vue' in package_json:
                     framework = 'Vue'
-                elif 'angular' in package_json:
+                if 'angular' in package_json:
                     framework = 'Angular'
-                elif 'next' in package_json:
+                if 'next' in package_json:
                     framework = 'Next.js'
-                elif 'express' in package_json:
+                if 'express' in package_json:
                     framework = 'Express'
         
         # Check for requirements.txt (Python)
-        if os.path.exists(os.path.join(repo_path, 'requirements.txt')):
-            with open(os.path.join(repo_path, 'requirements.txt'), 'r') as f:
+        req_path = find_file('requirements.txt')
+        if req_path:
+            with open(req_path, 'r', encoding='utf-8') as f:
                 requirements = f.read()
                 if 'django' in requirements:
                     framework = 'Django'
-                elif 'flask' in requirements:
+                if 'flask' in requirements:
                     framework = 'Flask'
-                elif 'fastapi' in requirements:
+                if 'fastapi' in requirements:
                     framework = 'FastAPI'
         
         # Check for go.mod (Go)
-        if os.path.exists(os.path.join(repo_path, 'go.mod')):
+        if find_file('go.mod'):
             framework = 'Go Module'
         
         # Check for Cargo.toml (Rust)
-        if os.path.exists(os.path.join(repo_path, 'Cargo.toml')):
+        if find_file('Cargo.toml'):
             framework = 'Cargo'
         
         return framework
