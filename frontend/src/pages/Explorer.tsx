@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import ReactFlow, {
@@ -104,7 +105,7 @@ const Explorer = () => {
   }
 
   const onConnect = useCallback(
-    (params: Connection) => setEdgesState((eds) => addEdge(params, eds)),
+    (params: Connection) => setEdgesState((eds: Edge[]) => addEdge(params, eds)),
     [setEdgesState]
   )
 

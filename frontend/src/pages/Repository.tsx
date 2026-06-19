@@ -2,15 +2,13 @@ import { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/useStore'
-import { apiService } from '../lib/api'
 import { ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import { AIArchitect } from '../components/AIArchitect'
 
 const Repository = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { currentRepository, isLoading, setRepository, setLoading, setNodes, setEdges } = useStore()
-
+  const { currentRepository, isLoading, setLoading } = useStore()
   useEffect(() => {
     if (id) {
       loadRepositoryData(id)

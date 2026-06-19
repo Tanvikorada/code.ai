@@ -64,7 +64,7 @@ async def ask_ai(
     else:
         GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
         GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-    
+
     system_prompt = (
         "You are an expert Software Architect AI assistant for CodexAtlas. "
         "You answer questions about the codebases scanned by the user. "
@@ -74,6 +74,9 @@ async def ask_ai(
     )
     user_prompt = f"Codebase Context:\n{context_summary}\n\nQuestion: {request.question}"
 
+    last_error = None
+
+    # Try Groq first
     if GROQ_API_KEY and not GROQ_API_KEY.startswith("your_"):
         try:
             async with httpx.AsyncClient() as client:
@@ -92,15 +95,19 @@ async def ask_ai(
                         "temperature": 0.2,
                         "max_tokens": 1024
                     },
-                    timeout=15.0
+                    timeout=20.0
                 )
                 if response.status_code == 200:
                     res_data = response.json()
                     answer = res_data["choices"][0]["message"]["content"]
                     return AIResponse(answer=answer, context=files[:5])
-        except Exception:
-            pass
-    elif GEMINI_API_KEY and not GEMINI_API_KEY.startswith("your_"):
+                else:
+                    last_error = f"Groq API error {response.status_code}: {response.text[:200]}"
+        except Exception as e:
+            last_error = f"Groq request failed: {str(e)}"
+
+    # Try Gemini as fallback
+    if GEMINI_API_KEY and not GEMINI_API_KEY.startswith("your_"):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
@@ -113,27 +120,32 @@ async def ask_ai(
                             "maxOutputTokens": 1024
                         }
                     },
-                    timeout=15.0
+                    timeout=20.0
                 )
                 if response.status_code == 200:
                     res_data = response.json()
                     answer = res_data["candidates"][0]["content"]["parts"][0]["text"]
                     return AIResponse(answer=answer, context=files[:5])
-        except Exception:
-            pass
+                else:
+                    last_error = f"Gemini API error {response.status_code}: {response.text[:200]}"
+        except Exception as e:
+            last_error = f"Gemini request failed: {str(e)}"
 
-    # Dynamic Smart Fallback when Groq key is missing or failed
+    # Offline fallback with error details
     framework_info = f"using {metadata.get('framework')}" if metadata.get('framework') != 'unknown' else ""
+    error_detail = f"\n\n**Error detail:** `{last_error}`" if last_error else ""
     fallback_answer = (
         f"**[Notice: Running in Offline Mode (no API Key set)]**\n\n"
         f"Based on the static analysis of **{metadata.get('name')}**, here is the structural context:\n"
         f"- **Language & Framework**: {metadata.get('language')} {framework_info}\n"
         f"- **Health Quality**: {health.get('overall_score')}/100 with maintainability score of {health.get('maintainability')}/100.\n"
         f"- **Identified Files**: The system analyzed {len(files)} file nodes, {len(classes)} class nodes, and {len(functions)} functions.\n\n"
-        f"To enable full repository-aware conversational answers, please set a valid `GROQ_API_KEY` or `GEMINI_API_KEY` in the backend environment variables."
+        f"To enable full repository-aware conversational answers, please set a valid `GROQ_API_KEY` or `GEMINI_API_KEY` in the backend environment variables, "
+        f"or click **Add Key** in the AI Assistant panel to use your own key.{error_detail}"
     )
     return AIResponse(
         answer=fallback_answer,
         context=files[:5]
     )
+
 

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/useStore'
 import { apiService } from '../lib/api'
-import { ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Loader2, CheckCircle, AlertCircle, Network, Zap, Brain, Shield, Clock, FileCode } from 'lucide-react'
 import { AIArchitect } from '../components/AIArchitect'
 
 const Repository = () => {
@@ -127,8 +127,78 @@ const Repository = () => {
             </div>
           </div>
 
+          {/* Platform Features Grid */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 tracking-tight relative z-10">Platform Features</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+              
+              <button onClick={() => navigate(`/explorer/${id}`)} className="glass-card glass-card-hover p-6 rounded-2xl text-left flex flex-col group cursor-pointer transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-4 text-aurora-cyan group-hover:scale-110 transition-transform">
+                  <Network className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Visual Knowledge Graph</h3>
+                <p className="text-white/50 text-sm">Interactive dependency maps</p>
+              </button>
+
+              <button onClick={() => alert('Story Mode is coming soon!')} className="glass-card glass-card-hover p-6 rounded-2xl text-left flex flex-col group cursor-pointer opacity-70 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-4 text-aurora-purple group-hover:scale-110 transition-transform">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Story Mode</h3>
+                <p className="text-white/50 text-sm">Cinematic flow animations (Coming Soon)</p>
+              </button>
+
+              <button onClick={() => {
+                const el = document.getElementById('ai-architect')
+                if(el) el.scrollIntoView({ behavior: 'smooth' })
+              }} className="glass-card glass-card-hover p-6 rounded-2xl text-left flex flex-col group cursor-pointer transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform">
+                  <Brain className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">AI Architect</h3>
+                <p className="text-white/50 text-sm">Ask repository-aware questions</p>
+              </button>
+
+              <button onClick={() => {
+                const el = document.getElementById('health-scanner')
+                if(el) el.scrollIntoView({ behavior: 'smooth' })
+              }} className="glass-card glass-card-hover p-6 rounded-2xl text-left flex flex-col group cursor-pointer transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-4 text-aurora-cyan group-hover:scale-110 transition-transform">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Health Scanner</h3>
+                <p className="text-white/50 text-sm">View code quality and metrics</p>
+              </button>
+
+              <button onClick={() => alert('Timeline Explorer is coming soon!')} className="glass-card glass-card-hover p-6 rounded-2xl text-left flex flex-col group cursor-pointer opacity-70 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-4 text-aurora-purple group-hover:scale-110 transition-transform">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Timeline Explorer</h3>
+                <p className="text-white/50 text-sm">Evolution of architecture (Coming Soon)</p>
+              </button>
+
+              <button onClick={async () => {
+                try {
+                  alert('Generating documentation in the background...')
+                  await apiService.generateDocumentation(id!)
+                  alert('Documentation generated successfully!')
+                } catch(e) {
+                  alert('Failed to generate documentation.')
+                }
+              }} className="glass-card glass-card-hover p-6 rounded-2xl text-left flex flex-col group cursor-pointer transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform">
+                  <FileCode className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Auto Documentation</h3>
+                <p className="text-white/50 text-sm">Generate docs automatically</p>
+              </button>
+
+            </div>
+          </div>
+
           {/* Analysis Summary */}
-          <div className="glass-card rounded-3xl p-10 relative overflow-hidden mb-8">
+          <div id="health-scanner" className="glass-card rounded-3xl p-10 relative overflow-hidden mb-8">
              <div className="absolute bottom-0 left-0 w-64 h-64 bg-aurora-purple/5 blur-[80px] rounded-full pointer-events-none" />
             
             <h2 className="text-2xl font-bold mb-8 tracking-tight relative z-10">Health Overview</h2>
@@ -149,7 +219,7 @@ const Repository = () => {
           </div>
 
           {/* AI Architect Section */}
-          <div className="mb-16">
+          <div id="ai-architect" className="mb-16">
             <h2 className="text-2xl font-bold mb-4 tracking-tight">AI Assistant</h2>
             <AIArchitect repoId={id || ''} />
           </div>

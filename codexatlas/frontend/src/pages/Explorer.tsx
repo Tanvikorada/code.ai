@@ -122,7 +122,7 @@ const Explorer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-obsidian flex flex-col font-sans relative">
+    <div className="h-screen bg-obsidian flex flex-col font-sans relative">
       {/* Background ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[600px] bg-aurora-purple/5 blur-[150px] pointer-events-none rounded-full mix-blend-screen" />
 
